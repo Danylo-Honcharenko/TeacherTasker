@@ -5,44 +5,55 @@
 #include <fstream>
 #include <cstdio>
 #include <stdlib.h>
-// #include <string.h>
 
 using namespace std;
 
+// Структура яка описує дату
 struct Date
 {
-	int day;
-	int month;
-	int year;
+	int day; // День
+	int month; // Місяць
+	int year; // Рік
 };
-
+// Структура яка описує викладача
 struct Teachers
 {
-	string nameAndSurname;
-	string conferenceVenue;
-	Date date;
-	string topic;
-	string topicTeacher;
+	string nameAndSurname; // Ініціали
+	string conferenceVenue; // Місто проведення конференції
+	Date date; // Дата проведення конференції
+	string topic; // Тема конференції
+	string topicTeacher; // Тема доповіді викладача
 };
-
+// Структура з унікальними даними
 struct Teacher
 {
-	string nameAndSurname;
-	int amount;
+	string nameAndSurname; // Ініціали
+	int amount; // Скільки разів викладача приймав участь у конференції
 };
 
+// Змінює напис при використанні функції system("pause"); з російської на українську
 void pause_ua(string message);
-void loadDataFromFile();
-bool loadData(Teachers teacher[], int* elem_arr);
-void printDataFromStruct();
-void addDataToStruct();
+// Завантажує дані з файлу в масив структур
+void loadDataFromFile(Teachers teachers[], int* elem_arr);
+// Виводить дані з масиву структур
+void printDataFromStruct(Teachers teachers[], int* elem_arr);
+// Додає дані до масиву структур
+void addDataToStruct(Teachers teachers[], int* elem_arr);
+// Виводить індивідуальне меню
 void individualMenu();
-void sort(Teachers teacher[], int* elem_arr);
+// Сортує дані за полем nameAndSurname по алфавіту
+void sortByAlphabet(Teachers teacher[], int* elem_arr);
+// Перевіряє введені користувачем пункти меню
 int checker();
+// Виводить викладачів за вказаним користувачем періодом 
 void printTeachersByDate(Teachers teachers[], int* elem_arr);
+// Перевіряе дату на коректність
 Date dateChecker();
+// Виводить найактивніших викладачів
 void activityTeachers(Teachers teachers[], int* elem_arr);
+// Сортує викладачів за активністю
 void sortActivityTeachers(Teacher teacher[], int k);
+// Виводить теми викладача за вказаними ініціалами
 void teacherTopic(Teachers teachers[], int* elem_arr);
 
 Teachers teachers[50];
@@ -70,13 +81,13 @@ int main()
 		switch (action)
 		{
 		case 1:
-			loadDataFromFile();
+			loadDataFromFile(teachers, &elem_arr);
 			break;
 		case 2:
-			printDataFromStruct();
+			printDataFromStruct(teachers, &elem_arr);
 			break;
 		case 3:
-			addDataToStruct();
+			addDataToStruct(teachers, &elem_arr);
 			break;
 		case 4:
 			individualMenu();
@@ -103,29 +114,12 @@ void pause_ua(string message)
 	system("PAUSE>nul");
 }
 
-void loadDataFromFile()
+void loadDataFromFile(Teachers teachers[], int* elem_arr)
 {
 	system("cls");
 
 	cout << "Завантаження даних із файлу...\n";
 
-	if (!loadData(teachers, &elem_arr)) return;
-
-	if (elem_arr == 0)
-	{
-		cout << "Файл порожній!\n";
-		cout << "Щоб продовжити, натисніть будь-яку клавішу . . .";
-		system("PAUSE>nul");
-		return;
-	}
-
-	cout << "Дані успішно вивантажені з файлу!\n";
-	cout << "Щоб продовжити, натисніть будь-яку клавішу . . .";
-	system("PAUSE>nul");
-}
-
-bool loadData(Teachers teachers[], int* elem_arr)
-{
 	string str;
 	fstream file;
 	int k(0);
@@ -168,16 +162,26 @@ bool loadData(Teachers teachers[], int* elem_arr)
 	else
 	{
 		pause_ua("Неможливо відкрити файл");
-		return isFileOpen = false;
+		return;
 	}
 	file.close();
 
 	*elem_arr = k;
 
-	return isFileOpen;
+	if (elem_arr == 0)
+	{
+		cout << "Файл порожній!\n";
+		cout << "Щоб продовжити, натисніть будь-яку клавішу . . .";
+		system("PAUSE>nul");
+		return;
+	}
+
+	cout << "Дані успішно вивантажені з файлу!\n";
+	cout << "Щоб продовжити, натисніть будь-яку клавішу . . .";
+	system("PAUSE>nul");
 }
 
-void printDataFromStruct()
+void printDataFromStruct(Teachers teachers[], int* elem_arr)
 {
 
 	if (elem_arr == 0)
@@ -189,11 +193,11 @@ void printDataFromStruct()
 	{
 		system("cls");
 
-		sort(teachers, &elem_arr);
+		sortByAlphabet(teachers, elem_arr);
 
 		cout << "Викладачі які приймають участь\n\n";
 
-		cout << "Усього записів: " << elem_arr << endl;
+		cout << "Усього записів: " << *elem_arr << endl;
 		cout << "+-------------------------------+\n";
 
 		cout.setf(ios::left);
@@ -214,7 +218,7 @@ void printDataFromStruct()
 
 		cout << endl << endl;
 
-		for (int i = 0; i < elem_arr; i++)
+		for (int i = 0; i < *elem_arr; i++)
 		{
 			cout.setf(ios::left);
 			cout.width(16);
@@ -251,7 +255,7 @@ void printDataFromStruct()
 	}
 }
 
-void addDataToStruct()
+void addDataToStruct(Teachers teachers[], int* elem_arr)
 {
 	char nameSurname[256];
 	char conferenceVenue[256];
@@ -261,7 +265,7 @@ void addDataToStruct()
 	fstream file;
 	file.open("C:\\Users\\danil\\source\\repos\\TeacherTasker\\TeacherTasker\\resources\\teachers.txt", ios::app);
 	bool isExit = true;
-	int k = elem_arr;
+	int k = *elem_arr;
 	string action;
 	bool isPresent = false;
 
@@ -291,7 +295,7 @@ void addDataToStruct()
 			cout << "Тема доповіді викладача: ";
 			cin.getline(topicTeacher, 256);
 
-			for (int i = 0; i < elem_arr; i++)
+			for (int i = 0; i < *elem_arr; i++)
 			{
 				if (nameSurname == teachers[i].nameAndSurname 
 					&& conferenceVenue == teachers[i].conferenceVenue
@@ -340,7 +344,7 @@ void addDataToStruct()
 			isExit = (action == "y") ? true : false;
 			k++;
 		}
-		elem_arr = k;
+		*elem_arr = k;
 	}
 	else
 	{
@@ -385,10 +389,9 @@ void individualMenu()
 		}
 		}
 	}
-
 }
 
-void sort(Teachers teacher[], int* elem_arr)
+void sortByAlphabet(Teachers teacher[], int* elem_arr)
 {
 	Teachers t;
 	for (int i = *elem_arr - 1; i >= 1; i--)
@@ -541,6 +544,7 @@ void printTeachersByDate(Teachers teachers[], int* elem_arr)
 		else if (dateFirst.month > dateSecond.month)
 		{
 			pause_ua("Перший зазначений вами місяць не може бути більшим за другий!");
+			return;
 		}
 		else if (dateFirst.year > dateSecond.year)
 		{
@@ -548,7 +552,7 @@ void printTeachersByDate(Teachers teachers[], int* elem_arr)
 			return;
 		}
 
-		sort(teachers, elem_arr);
+		sortByAlphabet(teachers, elem_arr);
 
 		system("cls");
 
@@ -615,7 +619,7 @@ void printTeachersByDate(Teachers teachers[], int* elem_arr)
 				k++;
 			}
 		}
-		cout << "+-------------------------------+\n";
+		cout << "\n+-------------------------------+\n";
 
 		if (k == 0)
 		{
@@ -728,7 +732,7 @@ void activityTeachers(Teachers teachers[], int* elem_arr)
 	teacher[0].amount = 0;
 	k++;
 
-	sort(teachers, elem_arr);
+	sortByAlphabet(teachers, elem_arr);
 
 	for (int i = 0; i < *elem_arr; i++)
 	{
